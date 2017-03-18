@@ -1,0 +1,2593 @@
+<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><link rel="stylesheet" href="style.min.css" type="text/css" media="all" /><script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script></head><body><h1 style="text-align:center;font-size:40px">Design Archive</h1><hr><article class="post-137855 post type-post status-publish format-standard hentry category-design tag-design" id="post-137855">
+<header class="entry-header">
+<h1 class="entry-title">Flyweight Design Pattern</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>Flyweight pattern is one of the <a href="http://www.geeksforgeeks.org/design-patterns-set-1-introduction/">structural design patterns</a> as this pattern provides ways to decrease object count thus improving application required objects structure. Flyweight pattern is used when we need to create a large number of similar objects (say 10<sup>5</sup>). <span style="color: #4a4a4a;">One important feature of flyweight objects is that they are</span> <b><span style="color: #4a4a4a;">immutable</span></b><span style="color: #4a4a4a;">. This means that they cannot be modified once they have been constructed.</span></p>
+<p style="text-align: justify;"><b>Why do we care for number of objects in our program?</b></p>
+<ul>
+<li style="text-align: justify;">Less number of objects reduces the memory usage, and it manages to keep us away from errors related to memory like <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/OutOfMemoryError.html"><span style="color: #1155cc;">java.lang.OutOfMemoryError.</span></a></li>
+<li>
+<p style="text-align: justify;">Although creating an object in Java is really fast, we can still reduce the execution time of our program by sharing objects.</p>
+</li>
+</ul>
+<p style="text-align: justify;">In Flyweight pattern we use a <a href="http://www.geeksforgeeks.org/hashmap-treemap-java/">HashMap</a> that stores reference to the object which have already been created, every object is associated with a key. Now when a client wants to create an object, he simply has to pass a key associated with it and if the object has already been created we simply get the reference to that object else it creates a new object and then returns it reference to the client.</p>
+<p><b>Intrinsic and Extrinsic States</b></p>
+<p>To understand Intrinsic and Extrinsic state, let us consider an example.</p>
+<p style="text-align: justify;">Suppose in a text editor when we enter a character, an object of Character class is created, the attributes of the Character class are {name, font, size}. We do not need to create an object every time client enters a character since letter ‘B’ is no different from another ‘B’ . If client again types a ‘B’ we simply return the object which we have already created before. Now all these are intrinsic states (name, font, size), since they can be shared among the different objects as they are similar to each other.</p>
+<p style="text-align: justify;">Now we add to more attributes to the Character class, they are row and column. They specify the position of a character in the document. Now these attributes will not be similar even for same characters, since no two characters will have the same position in a document, these states are termed as extrinsic states, and they can’t be shared among objects.</p>
+<p style="text-align: justify;"><b>Implementation : </b>We  implement the creation of Terrorists and Counter Terrorists In the game of <a href="https://en.wikipedia.org/wiki/Counter-Strike">Counter Strike</a>. So we have 2 classes one for <strong>T</strong>errorist(<strong>T</strong>) and other for <strong>C</strong>ounter <strong>T</strong>errorist(<strong>CT</strong>). Whenever a player asks for a weapon we assign him the asked weapon. In the mission, terrorist’s task is to plant a bomb while the counter terrorists have to diffuse the bomb.</p>
+<p style="text-align: justify;"><b>Why to use Flyweight Design Pattern in this example? </b>Here we  use the Fly Weight design pattern, since here we need to reduce the object count for players. Now we have n number of players playing CS 1.6, if we do not follow the Fly Weight Design Pattern then we will have to create n number of objects, one for each player. But now we will only have to create 2 objects one for terrorists and other for counter terrorists, we will reuse then again and again whenever required.</p>
+<p style="text-align: justify;"><b>Intrinsic State : </b>Here ‘task’ is an intrinsic state for both types of players, since this is always same for T’s/CT’s. We can have some other states like their color or any other properties which are similar for all the Terrorists/Counter Terrorists in their respective Terrorists/Counter Terrorists class.</p>
+<p><b>Extrinsic State : </b>Weapon is an extrinsic state since each player can carry any weapon of his/her choice. Weapon need to be passed as a parameter by the client itself.</p>
+<p>Class Diagram :<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/FwCd.png"><img alt="FwCd" class="aligncenter size-full wp-image-137856" height="397" sizes="(max-width: 683px) 100vw, 683px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/FwCd.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/FwCd.png 683w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/FwCd-300x174.png 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/FwCd-660x384.png 660w" width="683"/></a></p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// A Java program to demonstrate working of
+// FlyWeight Pattern with example of Counter
+// Strike Game
+import java.util.Random;
+import java.util.HashMap;
+
+// A common interface for all players
+interface Player
+{
+    public void assignWeapon(String weapon);
+    public void mission();
+}
+
+// Terrorist must have weapon and mission
+class Terrorist implements Player
+{
+    // Intrinsic Attribute
+    private final String TASK;
+
+    // Extrinsic Attribute
+    private String weapon;
+
+    public Terrorist()
+    {
+        TASK = "PLANT A BOMB";
+    }
+    public void assignWeapon(String weapon)
+    {
+        // Assign a weapon
+        this.weapon = weapon;
+    }
+    public void mission()
+    {
+        //Work on the Mission
+        System.out.println("Terrorist with weapon "
+                           + weapon + "|" + " Task is " + TASK);
+    }
+}
+
+// CounterTerrorist must have weapon and mission
+class CounterTerrorist implements Player
+{
+    // Intrinsic Attribute
+    private final String TASK;
+
+    // Extrinsic Attribute
+    private String weapon;
+
+    public CounterTerrorist()
+    {
+        TASK = "DIFFUSE BOMB";
+    }
+    public void assignWeapon(String weapon)
+    {
+        this.weapon = weapon;
+    }
+    public void mission()
+    {
+        System.out.println("Counter Terrorist with weapon "
+                           + weapon + "|" + " Task is " + TASK);
+    }
+}
+
+// Claass used to get a playeer using HashMap (Returns
+// an existing player if a player of given type exists.
+// Else creates a new player and returns it.
+class PlayerFactory
+{
+    /* HashMap stores the reference to the object
+       of Terrorist(TS) or CounterTerrorist(CT).  */
+    private static HashMap &lt;String, Player&gt; hm =
+                         new HashMap&lt;String, Player&gt;();
+
+    // Method to get a player
+    public static Player getPlayer(String type)
+    {
+        Player p = null;
+
+        /* If an object for TS or CT has already been
+           created simply return its reference */
+        if (hm.containsKey(type))
+                p = hm.get(type);
+        else
+        {
+            /* create an object of TS/CT  */
+            switch(type)
+            {
+            case "Terrorist":
+                System.out.println("Terrorist Created");
+                p = new Terrorist();
+                break;
+            case "CounterTerrorist":
+                System.out.println("Counter Terrorist Created");
+                p = new CounterTerrorist();
+                break;
+            default :
+                System.out.println("Unreachable code!");
+            }
+
+            // Once created insert it into the HashMap
+            hm.put(type, p);
+        }
+        return p;
+    }
+}
+
+// Driver class
+public class CounterStrike
+{
+    // All player types and weopons (used by getRandPlayerType()
+    // and getRandWeapon()
+    private static String[] playerType =
+                    {"Terrorist", "CounterTerrorist"};
+    private static String[] weapons =
+      {"AK-47", "Maverick", "Gut Knife", "Desert Eagle"};
+
+
+    // Driver code
+    public static void main(String args[])
+    {
+        /* Assume that we have a total of 10 players
+           in the game. */
+        for (int i = 0; i &lt; 10; i++)
+        {
+            /* getPlayer() is called simply using the class
+               name since the method is a static one */
+            Player p = PlayerFactory.getPlayer(getRandPlayerType());
+
+            /* Assign a weapon chosen randomly uniformly
+               from the weapon array  */
+            p.assignWeapon(getRandWeapon());
+
+            // Send this player on a mission
+            p.mission();
+        }
+    }
+
+    // Utility methods to get a random player type and
+    // weapon
+    public static String getRandPlayerType()
+    {
+        Random r = new Random();
+
+        // Will return an integer between [0,2)
+        int randInt = r.nextInt(playerType.length);
+
+        // return the player stored at index 'randInt'
+        return playerType[randInt];
+    }
+    public static String getRandWeapon()
+    {
+        Random r = new Random();
+
+        // Will return an integer between [0,5)
+        int randInt = r.nextInt(weapons.length);
+
+        // Return the weapon stored at index 'randInt'
+        return weapons[randInt];
+    }
+}
+</pre>
+<p> </p>
+<p><b>Output:</b></p>
+<pre class="gb wf prettyprint">Counter Terrorist Created
+Counter Terrorist with weapon Gut Knife| Task is DIFFUSE BOMB
+Counter Terrorist with weapon Desert Eagle| Task is DIFFUSE BOMB
+Terrorist Created
+Terrorist with weapon AK-47| Task is PLANT A BOMB
+Terrorist with weapon Gut Knife| Task is PLANT A BOMB
+Terrorist with weapon Gut Knife| Task is PLANT A BOMB
+Terrorist with weapon Desert Eagle| Task is PLANT A BOMB
+Terrorist with weapon AK-47| Task is PLANT A BOMB
+Counter Terrorist with weapon Desert Eagle| Task is DIFFUSE BOMB
+Counter Terrorist with weapon Gut Knife| Task is DIFFUSE BOMB
+Counter Terrorist with weapon Desert Eagle| Task is DIFFUSE BOMB</pre>
+<p><strong>References:</strong></p>
+<ul>
+<li>Elements of Reusable Object-Oriented Software(By Gang Of Four)</li>
+<li><a href="https://en.wikipedia.org/wiki/Flyweight_pattern">https://en.wikipedia.org/wiki/Flyweight_pattern</a></li>
+</ul>
+<p style="text-align: justify;">This article is contributed by <strong>Chirag Agarwal</strong>. If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p>Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137814 post type-post status-publish format-standard hentry category-design" id="post-137814">
+<header class="entry-header">
+<h1 class="entry-title">Curiously recurring template pattern (CRTP)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p></p><center><strong>Background:</strong></center><br/>
+It is recommended to refer <a href="http://www.geeksforgeeks.org/virtual-functions-and-runtime-polymorphism-in-c-set-1-introduction/">Virtual Functions and Runtime Polymorphism</a> as a prerequisite of this.  Below is an example program to demonstrate run time polymorphism.
+<pre class="brush: cpp; title: ; notranslate prettyprint" title="">
+// A simple C++ program to demonstrate run-time 
+// polymorphism
+#include &lt;iostream&gt;
+#include &lt;chrono&gt;
+using namespace std;
+
+typedef std::chrono::high_resolution_clock Clock;
+
+// To store dimensions of an image
+class Dimension
+{
+public:
+    Dimension(int _X, int _Y) {mX = _X;  mY = _Y; }
+private:
+    int mX, mY;
+};
+
+// Base class for all image types
+class Image
+{
+public:
+    virtual void Draw() = 0;
+    virtual Dimension GetDimensionInPixels() = 0;
+protected:
+    int dimensionX;
+    int dimensionY;
+};
+
+// For Tiff Images
+class TiffImage : public Image
+{
+public:
+    void Draw() { }
+    Dimension GetDimensionInPixels() {
+        return Dimension(dimensionX, dimensionY);
+    }
+};
+
+// There can be more derived classes like PngImage, 
+// BitmapImage, etc
+
+// Driver code that calls virtual function
+int main()
+{
+    // An image type  
+    Image* pImage = new TiffImage;
+
+    // Store time before virtual function calls
+    auto then = Clock::now();
+
+    // Call Draw 1000 times to make sure performance
+    // is visible
+    for (int i = 0; i &lt; 1000; ++i)
+        pImage-&gt;Draw();
+
+    // Store time after virtual function calls
+    auto now = Clock::now();
+
+    cout &lt;&lt; "Time taken: "
+         &lt;&lt; std::chrono::duration_cast
+           &lt;std::chrono::nanoseconds&gt;(now - then).count()
+         &lt;&lt; " nanoseconds" &lt;&lt; endl;
+
+    return 0;
+}
+</pre>
+<p>Output :
+</p><pre class="prettyprint">Time taken: 2613 nanoseconds</pre>
+<p>See <a href="http://ideone.com/K9uGcj">this</a> for above result.</p>
+<p>When a method is declared virtual, compiler secretly does two things for us:
+</p><ol>
+<li>Defines a VPtr in first 4 bytes of the class object</li>
+<li>Inserts code in constructor to initialize VPtr to point to the VTable</li>
+</ol>
+<p><strong>What are VTable and VPtr?</strong><br/>
+When a method is declared virtual in a class, compiler creates a virtual table (aka VTable) and stores addresses of virtual methods in that table. A virtual pointer (aka VPtr) is then created and initialized to point to that VTable. A VTable is shared across all the instances of the class, i.e. compiler creates only one instance of VTable to be shared across all the objects of a class. Each instance of the class has its own version of VPtr. If we print the size of a class object containing at least one virtual method, the output will be sizeof(class data) + sizeof(VPtr).<br/>
+Since address of virtual method is stored in VTable, VPtr can be manipulated to make calls to those virtual methods thereby violating principles of encapsulation. See below example:</p>
+<pre class="brush: cpp; title: ; notranslate prettyprint" title="">
+// A C++ program to demonstrate that we can directly
+// manipulate VPtr. Note that this program is based 
+// on the assumption that compiler store vPtr in a 
+// specific way to achieve run-time polymorphism.
+#include &lt;iostream&gt;
+using namespace std;
+
+#pragma pack(1)
+
+// A base class with virtual function foo()
+class CBase
+{
+public:
+    virtual void foo() noexcept {
+        cout &lt;&lt; "CBase::Foo() called" &lt;&lt; endl;
+    }
+protected:
+    int mData;
+};
+
+// A derived class with its own implementation
+// of foo() 
+class CDerived : public CBase
+{
+public:
+    void foo() noexcept  {
+        cout &lt;&lt; "CDerived::Foo() called" &lt;&lt; endl;
+    }
+private:
+    char cChar;
+};
+
+// Driver code
+int main()
+{
+    // A base type pointer pointing to derived
+    CBase *pBase = new CDerived;
+
+    // Accessing vPtr
+    int* pVPtr = *(int**)pBase;
+
+    // Calling virtual method
+    ((void(*)())pVPtr[0])();
+
+    // Changing vPtr
+    delete pBase;
+    pBase = new CBase;
+    pVPtr = *(int**)pBase;
+
+    // Calls method for new base object
+    ((void(*)())pVPtr[0])();
+
+    return 0;
+}
+</pre>
+<p>Output :
+</p><pre class="prettyprint">
+CDerived::Foo() called
+CBase::Foo() called </pre>
+<p>We are able to access vPtr and able to make calls to virtual methods through it. The memory representation of objects is explained <a href="http://www.geeksforgeeks.org/virtual-functions-and-runtime-polymorphism-in-c-set-1-introduction/">here</a>.</p>
+<p><strong>Is it wise to use virtual method?</strong><br/>
+As it can be seen, through base class pointer, call to derived class method is being dispatched. Everything seems to be working fine. Then what is the problem?<br/>
+If a virtual routine is called many times (order of hundreds of thousands), it drops the performance of system, reason being each time the routine is called, its address needs to be resolved by looking through VTable using VPtr. Extra indirection (pointer dereference) for each call to a virtual method makes accessing VTable a costly operation and it is better to avoid it as much as we can. </p>
+<p> </p>
+<p></p><center><b> Curiously Recurring Template Pattern (CRTP)</b></center><br/>
+Usage of VPtr and VTable can be avoided altogether through Curiously Recurring Template Pattern (CRTP).  CRTP is a design pattern in C++ in which a class X derives from a class template instantiation using X itself as template argument. More generally it is known as F-bound polymorphism.  
+<pre class="brush: cpp; title: ; notranslate prettyprint" title="">// Image program (similar to above) to demonstrate
+// working of CRTP
+#include &lt;iostream&gt;
+#include &lt;chrono&gt;
+using namespace std;
+
+typedef std::chrono::high_resolution_clock Clock;
+
+// To store dimensions of an image
+class Dimension
+{
+public:
+    Dimension(int _X, int _Y)
+    {
+        mX = _X;
+        mY = _Y;
+    }
+private:
+    int mX, mY;
+};
+
+// Base class for all image types. The template
+// parameter T is used to know type of derived
+// class pointed by pointer.
+template &lt;class T&gt;
+class Image
+{
+public:
+    void Draw()
+    {
+        // Dispatch call to exact type
+        static_cast&lt;T*&gt; (this)-&gt;Draw();
+    }
+    Dimension GetDimensionInPixels()
+    {
+        // Dispatch call to exact type
+        static_cast&lt;T*&gt; (this)-&gt;GetDimensionInPixels();
+    }
+
+protected:
+    int dimensionX, dimensionY;
+};
+
+
+// For Tiff Images
+class TiffImage : public Image&lt;TiffImage&gt;
+{
+public:
+    void Draw()
+    {
+        // Uncomment this to check method dispatch
+        // cout &lt;&lt; "TiffImage::Draw() called" &lt;&lt; endl;
+    }
+    Dimension GetDimensionInPixels()
+    {
+        return Dimension(dimensionX, dimensionY);
+    }
+};
+
+// There can be more derived classes like PngImage,
+// BitmapImage, etc
+
+// Driver code
+int main()
+{
+    // An Image type pointer pointing to Tiffimage
+    Image&lt;TiffImage&gt;* pImage = new TiffImage;
+
+    // Store time before virtual function calls
+    auto then = Clock::now();
+
+    // Call Draw 1000 times to make sure performance
+    // is visible
+    for (int i = 0; i &lt; 1000; ++i)
+        pImage-&gt;Draw();
+
+    // Store time after virtual function calls
+    auto now = Clock::now();
+
+    cout &lt;&lt; "Time taken: "
+         &lt;&lt; std::chrono::duration_cast
+         &lt;std::chrono::nanoseconds&gt;(now - then).count()
+         &lt;&lt; " nanoseconds" &lt;&lt; endl;
+
+    return 0;
+}
+</pre>
+<p>Output :
+</p><pre class="prettyprint">Time taken: 732 nanoseconds</pre>
+<p>See <a href="http://ideone.com/IPD5Va">this</a> for above result.</p>
+<p><strong>Virtual method vs CRTP benchmark</strong><br/>
+The time taken while using virtual method was 2613 nanoseconds. This (small) performance gain from CRTP is because the use of a VTable dispatch has been circumvented. Please note that the performance depends on a lot of factors like compiler used, operations performed by virtual methods. Performance numbers might differ in different runs, but (small) performance gain is expected from CRTP.<br/>
+Note: If we print size of class in CRTP, it can bee seen that VPtr no longer reserves 4 bytes of memory.
+</p><pre class="prettyprint"> 
+cout ) 
+<p>Questions? Keep them coming. We would love to answer.</p>
+<p><strong>Reference(s)</strong><br/>
+<a href="http://Reference(s) https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern </a></p>
+<p>This article is contributed by <strong><a href="https://about.me/aashishbarnwal">Aashish Barnwal</a></strong>. If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p>Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+
+			<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+
+		</pre></div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137761 post type-post status-publish format-standard hentry category-design" id="post-137761">
+<header class="entry-header">
+<h1 class="entry-title">Iterator Pattern</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>Iterator Pattern is a relatively simple and frequently used design pattern. There are a lot of data structures/collections available in every language. Each collection must provide an iterator that lets it iterate through its objects. However while doing so it should make sure that it does not expose its implementation.<br/>
+Suppose we are building an application that requires us to maintain a list of notifications. Eventually some part of your code will require to iterate over all notifications. If we implemented your collection of notifications as array you would iterate over them as:</p>
+<pre class="prettyprint">
+// If a simple array is used to store notifications
+for (int i = 0; i &lt; notificationList.length; i++)
+     Notification notification = notificationList[i]);
+
+</pre>
+<pre class="prettyprint">
+// If ArrayList is Java is used, then we would iterate
+// over them as:
+for (int i = 0; i &lt; notificationList.size(); i++)
+    Notification notification = (Notification)notificationList.get(i);
+</pre>
+<p>And if it were some other collection like set, tree etc. way of iterating would change slightly. Now what if we build an iterator that provides a generic way of iterating over a collection independent of its type.</p>
+<pre class="prettyprint">
+// Create an iterator
+Iterator iterator = notificationList.createIterator();
+
+// It wouldn’t matter if list is Array or ArrayList or
+// anything else.
+while (iterator.hasNext())
+{
+    Notification notification = iterator.next());
+}
+</pre>
+<p>Iterator pattern lets us do just that. Formally it is defined as below:<strong><br/>
+<i>The iterator pattern provides a way to access the elements of an aggregate object without exposing its underlying representation.</i></strong></p>
+<p><strong> <i>Class Diagram:</i></strong></p>
+<p style="text-align: justify;"><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it1.jpg"><img alt="it1" class="aligncenter size-full wp-image-137762" height="429" sizes="(max-width: 1027px) 100vw, 1027px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it1.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it1.jpg 1027w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it1-300x125.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it1-1024x428.jpg 1024w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it1-660x276.jpg 660w" width="1027"/></a></p>
+<p>Here we have a common interface Aggregate for client as it decouples it from the implementation of your collection of objects. The ConcreteIterator implements createIterator() that returns iterator for its collection. Each ConcreteAggregate’s responsibility is to instantiate a ConcreteIterator that can iterate over its collection of objects. The iterator interface provides a set of methods for traversing or modifying the collection that is in addition to next()/hasNext() it can also provide functions for search, remove etc.</p>
+<p>Let’s understand this through an example. Suppose we are creating a notification bar in our application that displays all the notifications which are held in a notification collection. NotificationCollection provides an iterator to iterate over its elements without exposing how it has implemented the collection (array in this case) to the Client (NotificationBar).<br/>
+ </p>
+<p>The class diagram would be:</p>
+<p><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it2.jpg"><img alt="it2" class="aligncenter size-full wp-image-137763" height="406" sizes="(max-width: 1001px) 100vw, 1001px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it2.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it2.jpg 1001w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it2-300x122.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/it2-660x268.jpg 660w" width="1001"/></a></p>
+<p>Below is the Java implementation of the same:</p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// A Java program to demonstrate implementation
+// of iterator pattern with the example of
+// notifications
+
+// A simple Notification class
+class Notification
+{
+    // To store notification message
+    String notification;
+
+    public Notification(String notification)
+    {
+        this.notification = notification;
+    }
+    public String getNotification()
+    {
+        return notification;
+    }
+}
+
+// Collection interface
+interface Collection
+{
+    public Iterator createIterator();
+}
+
+// Collection of notifications
+class NotificationCollection implements Collection
+{
+    static final int MAX_ITEMS = 6;
+    int numberOfItems = 0;
+    Notification[] notificationList;
+
+    public NotificationCollection()
+    {
+        notificationList = new Notification[MAX_ITEMS];
+
+        // Let us add some dummy notifications
+        addItem("Notification 1");
+        addItem("Notification 2");
+        addItem("Notification 3");
+    }
+
+    public void addItem(String str)
+    {
+        Notification notification = new Notification(str);
+        if (numberOfItems &gt;= MAX_ITEMS)
+            System.err.println("Full");
+        else
+        {
+            notificationList[numberOfItems] = notification;
+            numberOfItems = numberOfItems + 1;
+        }
+    }
+
+    public Iterator createIterator()
+    {
+        return new NotificationIterator(notificationList);
+    }
+}
+
+// We could also use Java.Util.Iterator
+interface Iterator
+{
+    // indicates whether there are more elements to
+    // iterate over
+    boolean hasNext();
+
+    // returns the next element
+    Object next();
+}
+
+// Notification iterator
+class NotificationIterator implements Iterator
+{
+    Notification[] notificationList;
+
+    // maintains curr pos of iterator over the array
+    int pos = 0;
+
+    // Constructor takes the array of notifiactionList are
+    // going to iterate over.
+    public  NotificationIterator (Notification[] notificationList)
+    {
+        this.notificationList = notificationList;
+    }
+
+    public Object next()
+    {
+        // return next element in the array and increment pos
+        Notification notification =  notificationList[pos];
+        pos += 1;
+        return notification;
+    }
+
+    public boolean hasNext()
+    {
+        if (pos &gt;= notificationList.length ||
+            notificationList[pos] == null)
+            return false;
+        else
+            return true;
+    }
+}
+
+// Contains collection of notifications as an object of
+// NotificationCollection
+class NotificationBar
+{
+    NotificationCollection notifications;
+
+    public NotificationBar(NotificationCollection notifications)
+    {
+        this.notifications = notifications;
+    }
+
+    public void printNotifications()
+    {
+        Iterator iterator = notifications.createIterator();
+        System.out.println("-------NOTIFICATION BAR------------");
+        while (iterator.hasNext())
+        {
+            Notification n = (Notification)iterator.next();
+            System.out.println(n.getNotification());
+        }
+    }
+}
+
+// Driver class
+class Main
+{
+    public static void main(String args[])
+    {
+        NotificationCollection nc = new NotificationCollection();
+        NotificationBar nb = new NotificationBar(nc);
+        nb.printNotifications();
+    }
+}
+</pre>
+<p>Output:</p>
+<pre class="prettyprint">-------NOTIFICATION BAR------------
+Notification 1
+Notification 2
+Notification 3</pre>
+<p>Notice that if we would have used ArrayList instead of Array there will not be any change in the client (notification bar) code due to the decoupling achieved by the use of iterator interface.</p>
+<p><b>References: </b><br/>
+<a href="http://www.amazon.com/Head-First-Design-Patterns/dp/0596007124"><span style="color: #3366bb;"><span style="font-family: Arial,serif;">Head First Design Patterns</span></span></a></p>
+<p style="text-align: justify;">This article is contributed by <strong>Sulabh Kumar.</strong>If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p>Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137759 post type-post status-publish format-standard hentry category-c-puzzles category-design tag-cpp-pointer" id="post-137759">
+<header class="entry-header">
+<h1 class="entry-title">Opaque Pointer</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p><strong>What is an opaque pointer?</strong><br/>
+Opaque as the name suggests is something we can’t see through. e.g. wood is opaque. Opaque pointer is a pointer which points to a DS whose contents are not exposed at the time of its definition.</p>
+<p>Following pointer is opaque. One can’t know the data contained in STest structure by looking at the definition.
+</p><pre class="prettyprint">
+struct STest* pSTest;</pre>
+<p>It is safe to assign NULL to an opaque pointer.
+</p><pre class="prettyprint">
+pSTest = NULL; </pre>
+<p><strong>Why Opaque pointer?</strong><br/>
+There are places where we just want to hint the compiler that “Hey! This is some DS which will be used by our clients. Don’t worry, clients will provide its implementation while preparing compilation unit”. Such type of design is robust when we deal with shared code. Please see below example:</p>
+<p>Let’s say we are working on an app to deal with images. Since we are living in a world where everything is moving to cloud and devices are very affordable to buy, we want to develop apps for windows, android and apple platforms. So, it would be nice to have a good design which is robust, scalable and flexible as per our requirements. We can have shared code which would be used by all platforms and then different end-point can have platform specific code.<br/>
+To deal with images, we have a CImage class exposing APIs to deal with various image operations (scale, rotate, move, save etc).<br/>
+Since all the platforms will be providing same operations, we would define this class in a header file. But the way an image is handled might differ across platforms. Like Apple can have different mechanism to access pixels of an image than Windows does. This means that APIs might demand different set of info to perform operations. So to work on shared code, this is what we would like to do:</p>
+<p><strong>Image.h :</strong> A header file to store class declaration.</p>
+<pre class="brush: cpp; title: ; notranslate prettyprint" title="">
+// This class provides API to deal with various
+// image operations. Different platforms can 
+// implement these operations in different ways.
+class CImage
+{
+public:
+    CImage();
+    ~CImage();
+    struct SImageInfo* pImageInfo;
+    void Rotate(double angle);
+    void Scale(double scaleFactorX, 
+               double scaleFactorY);
+    void Move(int toX, int toY);	
+private:
+    void InitImageInfo();
+};
+</pre>
+<p><strong>Image.cpp :</strong> Code that will be shared across different end-points</p>
+<pre class="brush: cpp; title: ; notranslate prettyprint" title="">
+// Constructor and destructor for CImage
+CImage::CImage()
+{
+    InitImageInfo();
+}
+
+CImage::~CImage()
+{
+    // Destroy stuffs here
+}
+</pre>
+<p><strong>Image_windows.cpp : </strong> Code specific to Windows will reside here</p>
+<pre class="brush: cpp; title: ; notranslate prettyprint" title="">
+struct SImageInfo
+{
+   // Windows specific DataSet
+};
+
+void CImage::InitImageInfo()
+{
+    pImageInfo = new SImageInfo;
+    // Initialize windows specific info here
+}
+
+void CImage::Rotate()
+{
+    // Make use of windows specific SImageInfo
+}
+</pre>
+<p><strong>Image_apple.cpp : </strong> Code specific to Apple will reside here</p>
+<pre class="brush: cpp; title: ; notranslate prettyprint" title="">
+struct SImageInfo
+{
+    // Apple specific DataSet
+};
+void CImage::InitImageInfo()
+{
+    pImageInfo = new SImageInfo;
+    
+    // Initialize apple specific info here
+}
+void CImage::Rotate()
+{
+    // Make use of apple specific SImageInfo
+}</pre>
+<p>As it can be seen from the above example, <strong>while defining blueprint of the CImage class we are only mentioning that there is a SImageInfo DS.<br/>
+The content of SImageInfo is unknown. Now it is the responsibility of clients(windows, apple, android) to define that DS and use it as per their requirement</strong>. If in future we want to develop app for a new end-point ‘X’, the design is already there. We only need to define SImageInfo for end-point ‘X’ and use it accordingly.</p>
+<p>Please note that the above explained example is one way of doing this. Design is all about discussion and requirement. A good design is decided taking many factors into account. We can also have platform specific classes like CImageWindows, CImageApple and put all platform specific code there. </p>
+<p>Questions? Keep them coming. We would love to answer.</p>
+<p>This article is contributed by <a href="https://about.me/aashishbarnwal?promo=email_sig&amp;utm_source=email_sig&amp;utm_medium=external_link&amp;utm_campaign=chrome_ext"><strong>Aashish Barnwal</strong></a>. Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/c-puzzles/" rel="category tag">C/C++ Puzzles</a></div><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/cpp-pointer/" rel="tag">cpp-pointer</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137729 post type-post status-publish format-standard hentry category-design tag-design" id="post-137729">
+<header class="entry-header">
+<h1 class="entry-title">Command Pattern</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p style="text-align: justify;">Like <a href="http://www.geeksforgeeks.org/category/design/">previous</a> articles, let us take up a design problem to understand command pattern. Suppose you are building a home automation system. There is a programmable remote which can be used to turn on and off various items in your home like lights, stereo, AC etc. It looks something like this.</p>
+<p> </p>
+<p><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/command.png"><img alt="command" class="aligncenter size-full wp-image-137730" height="299" sizes="(max-width: 299px) 100vw, 299px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/command.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/command.png 299w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/command-100x100.png 100w" width="299"/></a></p>
+<p>You can do it with simple if-else statements like</p>
+<pre class="prettyprint">if (buttonPressed == button1)
+     lights.on()
+</pre>
+<p style="text-align: justify;">But we need to keep in mind that turning on some devices like stereo comprises of many steps like setting cd, volume etc. Also we can reassign a button to do something else. By using simple if-else we are coding to implementation rather than interface. Also there is tight coupling.</p>
+<p style="text-align: justify;">So what we want to achieve is a design that provides loose coupling and remote control should not have much information about a particular device. The command pattern helps us do that.</p>
+<p style="text-align: justify;"><strong>Definition: </strong>The <strong>command pattern </strong>encapsulates a request as an object, thereby letting us parameterize other objects with different requests, queue or log requests, and support undoable operations.</p>
+<p style="text-align: justify;">The definition is a bit confusing at first but let’s step through it. In analogy to our problem above remote control is the client and stereo, lights etc. are the receivers. In command pattern there is a Command object that <em>encapsulates a request </em>by binding together a set of actions on a specific receiver. It does so by exposing just one method execute() that causes some actions to be invoked on the receiver.</p>
+<p style="text-align: justify;"><em>Parameterizing other objects with different requests </em>in our analogy means that the button used to turn on the lights can later be used to turn on stereo or maybe open the garage door.</p>
+<p style="text-align: justify;"><em>queue or log requests, and support undoable operations </em>means that Command’s Execute operation can store state for reversing its effects in the Command itself. The Command may have an added unExecute operation that reverses the effects of a previous call to execute.It may also support logging changes so that they can be reapplied in case of a system crash.</p>
+<p>Below is the Java implementation of above mentioned remote control example:</p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// A simple Java program to demonstrate
+// implementation of Command Pattern using
+// a remote control example.
+
+// An interface for command
+interface Command
+{
+    public void execute();
+}
+
+// Light class and its corresponding command
+// classes
+class Light
+{
+    public void on()
+    {
+        System.out.println("Light is on");
+    }
+    public void off()
+    {
+        System.out.println("Light is off");
+    }
+}
+class LightOnCommand implements Command
+{
+    Light light;
+
+    // The constructor is passed the light it
+    // is going to control.
+    public LightOnCommand(Light light)
+    {
+       this.light = light;
+    }
+    public void execute()
+    {
+       light.on();
+    }
+}
+class LightOffCommand implements Command
+{
+    Light light;
+    public LightOffCommand(Light light)
+    {
+        this.light = light;
+    }
+    public void execute()
+    {
+         light.off();
+    }
+}
+
+// Stereo and its command classes
+class Stereo
+{
+    public void on()
+    {
+        System.out.println("Stereo is on");
+    }
+    public void off()
+    {
+        System.out.println("Stereo is off");
+    }
+    public void setCD()
+    {
+        System.out.println("Stereo is set " +
+                           "for CD input");
+    }
+    public void setDVD()
+    {
+        System.out.println("Stereo is set"+
+                         " for DVD input");
+    }
+    public void setRadio()
+    {
+        System.out.println("Stereo is set" +
+                           " for Radio");
+    }
+    public void setVolume(int volume)
+    {
+       // code to set the volume
+       System.out.println("Stereo volume set"
+                          + " to " + volume);
+    }
+}
+class StereoOffCommand implements Command
+{
+    Stereo stereo;
+    public StereoOffCommand(Stereo stereo)
+    {
+        this.stereo = stereo;
+    }
+    public void execute()
+    {
+       stereo.off();
+    }
+}
+class StereoOnWithCDCommand implements Command
+{
+     Stereo stereo;
+     public StereoOnWithCDCommand(Stereo stereo)
+     {
+         this.stereo = stereo;
+     }
+     public void execute()
+     {
+         stereo.on();
+         stereo.setCD();
+         stereo.setVolume(11);
+     }
+}
+
+// A Simple remote control with one button
+class SimpleRemoteControl
+{
+    Command slot;  // only one button
+
+    public SimpleRemoteControl()
+    {
+    }
+
+    public void setCommand(Command command)
+    {
+        // set the command the remote will
+        // execute
+        slot = command;
+    }
+
+    public void buttonWasPressed()
+    {
+        slot.execute();
+    }
+}
+
+// Driver class
+class RemoteControlTest
+{
+    public static void main(String[] args)
+    {
+        SimpleRemoteControl remote =
+                  new SimpleRemoteControl();
+        Light light = new Light();
+        Stereo stereo = new Stereo();
+
+        // we can change command dynamically
+        remote.setCommand(new
+                    LightOnCommand(light));
+        remote.buttonWasPressed();
+        remote.setCommand(new
+                StereoOnWithCDCommand(stereo));
+        remote.buttonWasPressed();
+        remote.setCommand(new
+                   StereoOffCommand(stereo));
+        remote.buttonWasPressed();
+     }
+  }
+</pre>
+<p><strong>Output:</strong></p>
+<pre class="prettyprint">Light is on
+Stereo is on
+Stereo is set for CD input
+Stereo volume set to 11
+Stereo is off</pre>
+<p>Notice that the remote control doesn’t know anything about turning on the stereo. That information is contained in a separate command object. This reduces the coupling between them.</p>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Makes our code extensible as we can add new commands without changing existing code.</li>
+<li>Reduces coupling the invoker and receiver of a command.</li>
+</ul>
+<p><strong>Disadvantages:</strong></p>
+<ul>
+<li>Increase in the number of classes for each individual command</li>
+</ul>
+<p><strong><em>References:</em></strong></p>
+<ul>
+<li>Head First Design Patterns (book)</li>
+<li><a href="https://github.com/bethrobson/Head-First-Design-Patterns/tree/master/src/headfirst/designpatterns/command">https://github.com/bethrobson/Head-First-Design-Patterns/tree/master/src/headfirst/designpatterns/command</a></li>
+</ul>
+<p style="text-align: justify;">If This article is contributed by <strong>Sulabh Kumar</strong>. you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p>Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137684 post type-post status-publish format-standard hentry category-design tag-design" id="post-137684">
+<header class="entry-header">
+<h1 class="entry-title">Adapter Pattern</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>This pattern is easy to understand as the real world is full of adapters.   For example consider a USB to Ethernet adapter. We need this when we have an Ethernet interface on one end and USB on the other. Since they are incompatible with each other. we use an adapter that converts one to other. This example is pretty analogous to Object Oriented Adapters. In design, adapters are used when we have a class (Client) expecting some type of object and we have an object (Adaptee) offering the same features but exposing a different interface.</p>
+<p><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pattern1.jpg"><img alt="pattern1" class="aligncenter size-full wp-image-137693" height="213" sizes="(max-width: 500px) 100vw, 500px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pattern1.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pattern1.jpg 628w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pattern1-300x127.jpg 300w" width="500"/></a></p>
+<p style="text-align: justify;">To use an adapter:</p>
+<ol>
+<li style="text-align: justify;">The client makes a request to the adapter by calling a method on it using the target interface.</li>
+<li style="text-align: justify;">The adapter translates that request on the adaptee using the adaptee interface.</li>
+<li style="text-align: justify;">Client receive the results of the call and is unaware of adapter’s presence.</li>
+</ol>
+<p><strong><em>Definition:</em></strong></p>
+<p>The adapter pattern convert the interface of a class into another interface clients expect. Adapter lets classes work together that couldn’t otherwise because of incompatible interfaces.</p>
+<p><strong>Class Diagram:</strong><br/>
+<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/ad3.jpg"><img alt="ad3" class="aligncenter size-full wp-image-137687 gimvbnwaeyiwsazwjecs" height="253" sizes="(max-width: 432px) 100vw, 432px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/ad3.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/ad3.jpg 432w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/ad3-300x176.jpg 300w" width="432"/></a></p>
+<p>Image source = <a href="http://www.dofactory.com/net/adapter-design-pattern">http://www.dofactory.com/net/adapter-design-pattern</a></p>
+<p>The client sees only the target interface and not the adapter. The adapter implements the target interface. Adapter delegates all requests to Adaptee.</p>
+<p><strong>Example:</strong></p>
+<p style="text-align: justify;">Suppose you have a Bird class with fly() , and makeSound()methods. And also a ToyDuck class with squeak() method. Let’s assume that you are short on ToyDuck objects and you would like to use Bird objects in their place. Birds have some similar functionality but implement a different interface, so we can’t use them directly. So we will use adapter pattern. Here our client would be ToyDuck and adaptee would be Bird.</p>
+<p>Below is Java implementation of it.</p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Java implementation of Adapter pattern
+
+interface Bird
+{
+    // birds implement Bird interface that allows
+    // them to fly and make sounds adaptee interface
+    public void fly();
+    public void makeSound();
+}
+
+class Sparrow implements Bird
+{
+    // a concrete implementation of bird
+    public void fly()
+    {
+        System.out.println("Flying");
+    }
+    public void makeSound()
+    {
+        System.out.println("Chirp Chirp");
+    }
+}
+
+interface ToyDuck
+{
+    // target interface
+    // toyducks dont fly they just make
+    // squeaking sound
+    public void squeak();
+}
+
+class PlasticToyDuck implements ToyDuck
+{
+    public void squeak()
+    {
+        System.out.println("Squeak");
+    }
+}
+
+class BirdAdapter implements ToyDuck
+{
+    // You need to implement the interface your
+    // client expects to use.
+    Bird bird;
+    public BirdAdapter(Bird bird)
+    {
+        // we need reference to the object we
+        // are adapting
+        this.bird = bird;
+    }
+
+    public void squeak()
+    {
+        // translate the methods appropriately
+        bird.makeSound();
+    }
+}
+
+class Main
+{
+    public static void main(String args[])
+    {
+        Sparrow sparrow = new Sparrow();
+        PlasticToyDuck toyDuck = new PlasticToyDuck();
+
+        // Wrap a bird in a birdAdapter so that it 
+        // behaves like toy duck
+        ToyDuck birdAdapter = new BirdAdapter(sparrow);
+
+        System.out.println("Sparrow...");
+        sparrow.fly();
+        sparrow.makeSound();
+
+        System.out.println("ToyDuck...");
+        toyDuck.squeak();
+
+        // bird behaving like a toy duck
+        System.out.println("BirdAdapter...");
+        birdAdapter.squeak();
+    }
+}
+</pre>
+<p>Output:</p>
+<pre class="prettyprint">Sparrow...
+Flying
+Chirp Chirp
+ToyDuck...
+Squeak
+BirdAdapter...
+Chirp Chirp</pre>
+<p><strong>Object Adapter Vs Class Adapter</strong><br/>
+The adapter pattern we have implemented above is called Object Adapter Pattern because the adapter holds an instance of adaptee. There is also another type called Class Adapter Pattern which use inheritance instead of composition but you require multiple inheritance to implement it.<br/>
+Class diagram of Class Adapter Pattern:<br/>
+<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pattern4.jpg"><img alt="pattern4" class="aligncenter size-full wp-image-137692" height="201" sizes="(max-width: 547px) 100vw, 547px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pattern4.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pattern4.jpg 547w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pattern4-300x110.jpg 300w" width="547"/></a><br/>
+Image Source = <a href="http://www.bogotobogo.com/DesignPatterns/images/adapter/class_adapter.gif">http://www.bogotobogo.com/DesignPatterns/images/adapter/class_adapter.gif</a></p>
+<p>Here instead of having an adaptee object inside adapter (composition) to make use of its functionality adapter inherits the adaptee.</p>
+<p>Since multiple inheritance is not supported by many languages including java and is associated with many problems we have not shown implementation using class adapter pattern.</p>
+<p><strong>Advantages:</strong></p>
+<ul>
+<li>Helps achieve reusability and flexibility.</li>
+<li>Client class is not complicated by having to use a different interface and can use polymorphism to swap between different implementations of adapters.</li>
+</ul>
+<p><strong>Disadvantages:</strong></p>
+<ul>
+<li>All requests are forwarded, so there is a slight increase in the overhead.</li>
+<li>Sometimes many adaptations are required along an adapter chain to reach the type which is required.</li>
+</ul>
+<p><strong>References:</strong><br/>
+Head First Design Patterns ( Book )</p>
+<p style="text-align: justify;">This article is contributed by <strong>Sulabh Kumar.</strong> If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p style="text-align: justify;">Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137640 post type-post status-publish format-standard hentry category-design tag-design" id="post-137640">
+<header class="entry-header">
+<h1 class="entry-title">Strategy Pattern | Set 2 (Implementation)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>We have discussed a fighter example and introduced Strategy Pattern in set 1.</p>
+<p><a href="http://www.geeksforgeeks.org/strategy-pattern-set-1/">Strategy Pattern | Set 1 (Introduction)</a></p>
+<p>In this post, we apply Strategy Pattern to the Fighter Problem and discuss implementation.</p>
+<p style="text-align: justify;">The first step is to identify the behaviors that may vary across different classes in future and separate them from the rest. For our example let them be kick and jump behaviors. To separate these behaviors we will pull both methods out of <strong>Fighter</strong> class and create a new set of classes to represent each behavior.</p>
+<p><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter3.png"><img alt="fighter3" class="aligncenter wp-image-137636" height="464" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter3.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter3.png 1914w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter3-300x139.png 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter3-1024x475.png 1024w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter3-660x306.png 660w" width="1000"/></a></p>
+<p>The Fighter class will now delegate its kick and jump behavior instead of using kick and jump methods defined in the Fighter class or its subclass.</p>
+<p><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter4.png"><img alt="fighter4" class="aligncenter wp-image-137637" height="464" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter4.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter4.png 1914w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter4-300x139.png 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter4-1024x475.png 1024w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter4-660x306.png 660w" width="1000"/></a></p>
+<p>After reworking the final class diagram would be (Click on image for better view):<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/f1.jpg"><img alt="f1" class="aligncenter size-full wp-image-137682" height="562" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/f1.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/f1.jpg 1000w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/f1-300x169.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/f1-660x371.jpg 660w" width="1000"/></a></p>
+<p> </p>
+<p>Comparing our design to the definition of strategy pattern encapsulated kick and jump behaviors are two families of algorithms. And these algorithms are interchangeable as evident in implementation.</p>
+<p>Below is the Java implementation of the same.</p>
+<p> </p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Java program to demonstrate implementation of
+// Strategy Pattern
+
+// Abstract as you must have a specific fighter
+abstract class Fighter
+{
+    KickBehavior kickBehavior;
+    JumpBehavior jumpBehavior;
+
+    public Fighter(KickBehavior kickBehavior,
+                   JumpBehavior jumpBehavior)
+    {
+        this.jumpBehavior = jumpBehavior;
+        this.kickBehavior = kickBehavior;
+    }
+    public void punch()
+    {
+        System.out.println("Default Punch");
+    }
+    public void kick()
+    {
+        // delegate to kick behavior
+        kickBehavior.kick();
+    }
+    public void jump()
+    {
+
+        // delegate to jump behavior
+        jumpBehavior.jump();
+    }
+    public void roll()
+    {
+        System.out.println("Default Roll");
+    }
+    public void setKickBehavior(KickBehavior kickBehavior)
+    {
+        this.kickBehavior = kickBehavior;
+    }
+    public void setJumpBehavior(JumpBehavior jumpBehavior)
+    {
+        this.jumpBehavior = jumpBehavior;
+    }
+    public abstract void display();
+}
+
+// Encapsulated kick behaviors
+interface KickBehavior
+{
+    public void kick();
+}
+class LightningKick implements KickBehavior
+{
+    public void kick()
+    {
+        System.out.println("Lightning Kick");
+    }
+}
+class TornadoKick implements KickBehavior
+{
+    public void kick()
+    {
+        System.out.println("Tornado Kick");
+    }
+}
+
+// Encapsulated jump behaviors
+interface JumpBehavior
+{
+    public void jump();
+}
+class ShortJump implements JumpBehavior
+{
+    public void jump()
+    {
+        System.out.println("Short Jump");
+    }
+}
+class LongJump implements JumpBehavior
+{
+    public void jump()
+    {
+        System.out.println("Long Jump");
+    }
+}
+
+// Characters
+class Ryu extends Fighter
+{
+    public Ryu(KickBehavior kickBehavior,
+               JumpBehavior jumpBehavior)
+    {
+        super(kickBehavior,jumpBehavior);
+    }
+    public void display()
+    {
+        System.out.println("Ryu");
+    }
+}
+class Ken extends Fighter
+{
+    public Ken(KickBehavior kickBehavior,
+               JumpBehavior jumpBehavior)
+    {
+        super(kickBehavior,jumpBehavior);
+    }
+    public void display()
+    {
+        System.out.println("Ken");
+    }
+}
+class ChunLi extends Fighter
+{
+    public ChunLi(KickBehavior kickBehavior,
+                  JumpBehavior jumpBehavior)
+    {
+        super(kickBehavior,jumpBehavior);
+    }
+    public void display()
+    {
+        System.out.println("ChunLi");
+    }
+}
+
+// Driver class
+class StreetFighter
+{
+    public static void main(String args[])
+    {
+        // let us make some behaviors first
+        JumpBehavior shortJump = new ShortJump();
+        JumpBehavior LongJump = new LongJump();
+        KickBehavior tornadoKick = new TornadoKick();
+
+        // Make a fighter with desired behaviors
+        Fighter ken = new Ken(tornadoKick,shortJump);
+        ken.display();
+
+        // Test behaviors
+        ken.punch();
+        ken.kick();
+        ken.jump();
+
+        // Change behavior dynamically (algorithms are
+        // interchangeable)
+        ken.setJumpBehavior(LongJump);
+        ken.jump();
+    }
+}
+</pre>
+<p>Output :</p>
+<pre class="prettyprint">Ken
+Default Punch
+Tornado Kick
+Short Jump
+Long Jump
+</pre>
+<p><strong><em>References:</em></strong><br/>
+<a href="http://www.amazon.com/Head-First-Design-Patterns/dp/0596007124">Head First Design Patterns</a></p>
+<p style="text-align: justify;">This article is contributed by <strong>Sulabh Kumar</strong>. If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p>Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137633 post type-post status-publish format-standard hentry category-design tag-design" id="post-137633">
+<header class="entry-header">
+<h1 class="entry-title">Strategy Pattern | Set 1 (Introduction)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p style="text-align: justify;">As always we will learn this pattern by defining a problem and using strategy pattern to solve it. Suppose we are building a game “Street Fighter”. For simplicity assume that a character may have four moves that is kick, punch, roll and jump. Every character has kick and punch moves, but roll and jump are optional. How would you model your classes? Suppose initially you use inheritance and abstract out the common features in a <strong>Fighter</strong> class and let other characters subclass <strong>Fighter</strong> class.</p>
+<p style="text-align: justify;"><strong>Fighter</strong> class will we have default implementation of normal actions. Any character with specialized move can override that action in its subclass. <span style="line-height: 1.5;">Class diagram would be as follows:</span></p>
+<p style="text-align: justify;"><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter1.jpg"><img alt="fighter1" class="aligncenter wp-image-137634" height="464" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter1.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter1.jpg 1914w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter1-300x139.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter1-1024x475.jpg 1024w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter1-660x306.jpg 660w" width="1000"/></a></p>
+<p><strong>What are the problems with above design?</strong></p>
+<p>What if a character doesn’t perform jump move? It still inherits the jump behavior from superclass. Although you can override jump to do nothing in that case but you may have to do so for many existing classes and take care of that for future classes too. This would also make maintenance difficult. So we can’t use inheritance here.</p>
+<p><strong>What about an Interface?</strong></p>
+<p>Take a look at the following design:<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter2.jpg"><img alt="fighter2" class="aligncenter wp-image-137635" height="499" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter2.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter2.jpg 1780w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter2-300x150.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter2-1024x511.jpg 1024w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/fighter2-660x329.jpg 660w" width="1000"/></a></p>
+<p> </p>
+<p style="text-align: justify;">It’s much cleaner. We took out some actions (which some characters might not perform) out of <strong>Fighter</strong>class and made interfaces for them. That way only characters that are supposed to jump will implement the <strong>JumpBehavior.</strong></p>
+<p style="text-align: justify;"><strong>What are the problems with above design?</strong></p>
+<p style="text-align: justify;">The main problem with the above design is code reuse. Since there is no default implementation of jump and roll behavior we may have code duplicity. You may have to rewrite the same jump behavior over and over in many subclasses.</p>
+<p><strong>How can we avoid this?</strong></p>
+<p style="text-align: justify;">What if we made <strong>JumpBehavior</strong> and <strong>RollBehavior </strong>classes instead of interface? Well then we would have to use multiple inheritance that is not supported in many languages due to many problems associated with it.</p>
+<p style="text-align: justify;"><em>Here strategy pattern comes to our rescue. We will learn what the strategy pattern is and then apply it to solve our problem.</em></p>
+<p style="text-align: justify;"><strong>Definition:</strong></p>
+<p style="text-align: justify;">Wikipedia defines strategy pattern as:</p>
+<p style="text-align: justify;"><em>“In computer programming, the <strong>strategy pattern</strong> (also known as the <strong>policy pattern</strong>) is a software design pattern that enables an algorithm’s behavior to be selected at runtime. The strategy pattern</em></p>
+<ul>
+<li style="text-align: justify;"><em>defines a family of algorithms,</em></li>
+<li style="text-align: justify;"><em>encapsulates each algorithm, and</em></li>
+<li style="text-align: justify;"><em>makes the algorithms interchangeable within that family.”</em></li>
+</ul>
+<p><em> </em></p>
+<p><strong><em>Class</em> Diagram:<img alt="Untitled" class="aligncenter wp-image-137639 size-full" height="164" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/Untitled.png" width="260"/></strong></p>
+<p>Imgsrc = <a href="https://upload.wikimedia.org/wikipedia/commons/3/39/Strategy_Pattern_in_UML.png">https://upload.wikimedia.org/wikipedia/commons/3/39/Strategy_Pattern_in_UML.png</a></p>
+<p style="text-align: justify;">Here we rely on composition instead of inheritance for reuse. <strong>Context </strong>is composed of a <strong>Strategy</strong>. Instead of implementing a behavior the <strong>Context</strong> delegates it to <strong>Strategy</strong>. The context would be the class that would require changing behaviors. We can change behavior dynamically. <strong>Strategy</strong> is implemented as interface so that we can change behavior without affecting our context.</p>
+<p>We will have a clearer understanding  of strategy pattern when we will use it to solve our problem.</p>
+<p style="text-align: justify;"><strong>Advantages:</strong></p>
+<ol>
+<li style="text-align: justify;">A family of algorithms can be defined as a class hierarchy and can be used interchangeably to alter application behavior without changing its architecture.</li>
+<li style="text-align: justify;">By encapsulating the algorithm separately, new algorithms complying with the same interface can be easily introduced.</li>
+<li style="text-align: justify;">The application can switch strategies at run-time.</li>
+<li style="text-align: justify;">Strategy enables the clients to choose the required algorithm, without using a “switch” statement or a series of “if-else” statements.</li>
+<li style="text-align: justify;">Data structures used for implementing the algorithm are completely encapsulated in Strategy classes. Therefore, the implementation of an algorithm can be changed without affecting the Context class.</li>
+</ol>
+<p style="text-align: justify;"><strong>Disadvantages:</strong></p>
+<ol>
+<li style="text-align: justify;">The application must be aware of all the strategies to select the right one for the right situation.</li>
+<li style="text-align: justify;">Context and the Strategy classes normally communicate through the interface specified by the abstract Strategy base class. Strategy base class must expose interface for all the required behaviours, which some concrete Strategy classes might not implement.</li>
+<li style="text-align: justify;">In most cases, the application configures the Context with the required Strategy object. Therefore, the application needs to create and maintain two objects in place of one.</li>
+</ol>
+<p><strong><em> </em></strong></p>
+<p><strong><em>References:</em></strong></p>
+<ul>
+<li><a href="http://www.amazon.com/Head-First-Design-Patterns/dp/0596007124">Head First Design Patterns</a></li>
+<li><a href="http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2007/wiki1b_8_sa">http://wiki.expertiza.ncsu.edu/index.php/CSC/ECE_517_Fall_2007/wiki1b_8_sa</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Strategy_pattern">https://en.wikipedia.org/wiki/Strategy_pattern</a></li>
+</ul>
+<p>This article is contributed by <strong>Sulabh Kumar.</strong> If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p>Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137592 post type-post status-publish format-standard hentry category-design" id="post-137592">
+<header class="entry-header">
+<h1 class="entry-title">Decorator Pattern | Set 3 (Coding the Design)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>We have discussed <a href="http://www.geeksforgeeks.org/decorator-pattern/">Pizza design problem and different naive approaches to solve it</a> in set 1. We have also introduced <a href="http://www.geeksforgeeks.org/the-decorator-pattern-set-2-introduction-and-design/">Decorator pattern in Set 2</a>.</p>
+<p>In this article, design and implementation of decorator pattern for Pizza problem is discussed. It is highly recommended that you try it yourself first.</p>
+<p>The new class diagram (Click on the picture to see it clearly)<br/>
+<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza5.jpg"><img alt="pizza5" class="aligncenter wp-image-137593" height="569" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza5.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza5.jpg 1568w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza5-300x171.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza5-1024x583.jpg 1024w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza5-660x375.jpg 660w" width="1000"/></a></p>
+<ul>
+<li style="text-align: justify;"><strong>Pizza </strong>acts as our abstract component class.</li>
+<li style="text-align: justify;">There are four concrete components namely <strong>PeppyPaneer</strong> , <strong>FarmHouse</strong>, <strong>Margherita</strong>, <strong>ChickenFiesta</strong>.</li>
+<li style="text-align: justify;"><strong>ToppingsDecorator</strong>is our abstract decorator and <strong>FreshTomato</strong> , <strong>Paneer</strong>, <strong>Jalapeno</strong>, <strong>Barbeque</strong> are concrete decorators.</li>
+</ul>
+<p>Below is the java implementation of above design.</p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Java program to demonstrate Decorator
+// pattern
+
+// Abstract Pizza class (All classes extend
+// from this)
+abstract class Pizza
+{
+    // it is an abstract pizza
+    String description = "Unkknown Pizza";
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public abstract int getCost();
+}
+
+// The decorator class :  It extends Pizza to be
+// interchangable with it topings decorator can
+// also be implemented as an interface
+abstract class ToppingsDecorator extends Pizza
+{
+    public abstract String getDescription();
+}
+
+// Concrete pizza classes
+class PeppyPaneer extends Pizza
+{
+    public PeppyPaneer() { description = "PeppyPaneer"; }
+    public int getCost() {  return 100; }
+}
+class FarmHouse extends Pizza
+{
+    public FarmHouse() {  description = "FarmHouse"; }
+    public int getCost() { return 200; }
+}
+class Margherita extends Pizza
+{
+    public Margherita()  { description = "Margherita"; }
+    public int getCost() { return 100;  }
+}
+class ChickenFiesta extends Pizza
+{
+    public ChickenFiesta() { description = "ChickenFiesta";}
+    public int getCost() { return 200; }
+}
+class SimplePizza extends Pizza
+{
+public SimplePizza() { description = "SimplePizza"; }
+public int getCost() {  return 50;  }
+}
+
+// Concrete toppings classes
+class FreshTomato extends ToppingsDecorator
+{
+    // we need a reference to obj we are decorating
+    Pizza pizza;
+
+    public FreshTomato(Pizza pizza) { this.pizza = pizza; }
+    public String getDescription() {
+        return pizza.getDescription() + ", Fresh Tomato ";
+    }
+    public int getCost() { return 40 + pizza.getCost(); }
+}
+class Barbeque extends ToppingsDecorator
+{
+    Pizza pizza;
+    public Barbeque(Pizza pizza) {  this.pizza = pizza;  }
+    public String getDescription() {
+        return pizza.getDescription() + ", Barbeque ";
+    }
+    public int getCost() { return 90 + pizza.getCost(); }
+}
+class Paneer extends ToppingsDecorator
+{
+    Pizza pizza;
+    public Paneer(Pizza pizza)  {  this.pizza = pizza; }
+    public String getDescription() {
+        return pizza.getDescription() + ", Paneer ";
+    }
+    public int getCost()  {  return 70 + pizza.getCost(); }
+}
+
+// Other toppings can be coded in a similar way
+
+// Driver class and method
+class PizzaStore
+{
+    public static void main(String args[])
+    {
+        // create new margherita pizza
+        Pizza pizza = new Margherita();
+        System.out.println( pizza.getDescription() +
+                         " Cost :" + pizza.getCost());
+
+        // create new FarmHouse pizza
+        Pizza pizza2 = new FarmHouse();
+
+        // decorate it with freshtomato topping
+        pizza2 = new FreshTomato(pizza2);
+
+        //decorate it with paneer topping
+        pizza2 = new Paneer(pizza2);
+
+        System.out.println( pizza2.getDescription() +
+                         " Cost :" + pizza2.getCost());
+        Pizza pizza3 = new Barbeque(null);    //no specific pizza
+        System.out.println( pizza3.getDescription() + "  Cost :" + pizza3.getCost());
+   }
+}
+</pre>
+<p>Output:</p>
+<pre class="prettyprint">Margherita Cost :100
+FarmHouse, Fresh Tomato , Paneer Cost :310
+</pre>
+<p>Notice how we can add/remove new pizzas and toppings with no alteration in previously tested code and toppings and pizzas are decoupled.</p>
+<p style="text-align: justify;">This article is contributed by <strong>Sulabh Kumar.</strong> If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p style="text-align: justify;">Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137586 post type-post status-publish format-standard hentry category-design" id="post-137586">
+<header class="entry-header">
+<h1 class="entry-title">The Decorator Pattern | Set 2 (Introduction and Design)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p style="text-align: justify;">As we saw our <a href="http://www.geeksforgeeks.org/decorator-pattern/">previous designs</a> using inheritance didn’t work out that well. In this article, decorator pattern is discussed for the design problem in previous set.</p>
+<p>So what we do now is take a pizza and “decorate” it with toppings at runtime:</p>
+<ol>
+<li>Take a pizza object.</li>
+</ol>
+<p><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz1.png"><img alt="piz1" class="aligncenter size-full wp-image-137587" height="173" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz1.png" width="167"/></a><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz3.png"><br/>
+</a></p>
+<ol start="2">
+<li>“Decorate” it with a Capsicum object.</li>
+</ol>
+<p><img alt="piz2" class="aligncenter size-full wp-image-137588" height="234" sizes="(max-width: 321px) 100vw, 321px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz2.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz2.png 321w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz2-300x219.png 300w" width="321"/></p>
+<ol start="3">
+<li>“Decorate” it with a CheeseBurst object.<img alt="piz3" class="aligncenter size-full wp-image-137589" height="275" sizes="(max-width: 366px) 100vw, 366px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz3.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz3.png 366w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz3-300x225.png 300w" width="366"/></li>
+<li>Call getCost() and use delegation instead of inheritance to calculate the toppings cost.<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/decorator-pattern.png"><img alt="decorator pattern" class="aligncenter size-full wp-image-138321" height="277" sizes="(max-width: 418px) 100vw, 418px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/decorator-pattern.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/decorator-pattern.png 418w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/decorator-pattern-300x199.png 300w" width="418"/></a></li>
+</ol>
+<p style="text-align: justify;">What we get in the end is a pizza with cheeseburst and capsicum toppings. Visualize the “decorator” objects  like wrappers. Here are some of the properties of decorators:</p>
+<ul style="text-align: justify;">
+<li>Decorators have the same super type as the object they decorate.</li>
+<li>You can use multiple decorators to wrap an the object.</li>
+<li>Since decorators have same type as object, we can pass around decorated object instead of original.</li>
+<li>We can decorate objects at runtime.</li>
+</ul>
+<p style="text-align: justify;"><strong>Definition:</strong></p>
+<p><em>The decorator pattern attaches additional responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing for extending functionality.</em></p>
+<p><strong>Class Diagram:<img alt="piz5" class="aligncenter size-full wp-image-137591" height="321" sizes="(max-width: 404px) 100vw, 404px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz5.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz5.png 404w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/piz5-300x238.png 300w" width="404"/></strong>Image src: <a href="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Decorator_UML_class_diagram.svg/600px-Decorator_UML_class_diagram.svg.png" target="_blank">Wikipedia</a></p>
+<ul>
+<li style="text-align: justify;">Each component can be used on its own or may be wrapped by a decorator.</li>
+<li style="text-align: justify;">Each decorator has an instance variable that holds the reference to component it decorates(HAS-A relationship).</li>
+<li style="text-align: justify;">The ConcreteComponent is the object we are going to dynamically decorate.</li>
+</ul>
+<p style="text-align: justify;"><strong>Advantages:</strong></p>
+<ul>
+<li style="text-align: justify;">The decorator pattern can be used to make it possible to extend (decorate) the functionality of a certain object at runtime<strong>.</strong></li>
+<li style="text-align: justify;">The decorator pattern is an alternative to subclassing. Subclassing adds behavior at compile time, and the change affects all instances of the original class; decorating can provide new behavior at runtime for individual objects.</li>
+<li style="text-align: justify;">Decorator offers a pay-as-you-go approach to adding responsibilities. Instead of trying to support all foreseeable features in a complex, customizable class, you can define a simple class and add functionality incrementally with Decorator objects.</li>
+</ul>
+<p style="text-align: justify;"><strong>Disadvantages:</strong></p>
+<ul style="text-align: justify;">
+<li>Decorators can complicate the process of instantiating the component because you not only have to instantiate the component, but wrap it in a number of decorators.</li>
+<li>It can be complicated to have decorators keep track of other decorators, because to look back into multiple layers of the decorator chain starts to push the decorator pattern beyond its true intent.</li>
+</ul>
+<p style="text-align: justify;"><strong>References:</strong></p>
+<ul>
+<li>Head First Design Patterns(Book)</li>
+<li><a href="https://neillmorgan.wordpress.com/2010/02/07/decorator-pattern-pros-and-cons/">https://neillmorgan.wordpress.com/2010/02/07/decorator-pattern-pros-and-cons/</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Decorator_pattern">https://en.wikipedia.org/wiki/Decorator_pattern</a></li>
+<li><a href="http://stackoverflow.com/questions/4842978/decorator-pattern-versus-sub-classing">http://stackoverflow.com/questions/4842978/decorator-pattern-versus-sub-classing</a></li>
+</ul>
+<p>In the next post, we will be discussing implementation of decorator pattern.</p>
+<p style="text-align: justify;">This article is contributed by <strong>Sulabh Kumar</strong>. If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p style="text-align: justify;">Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137553 post type-post status-publish format-standard hentry category-design tag-design" id="post-137553">
+<header class="entry-header">
+<h1 class="entry-title">Decorator Pattern | Set 1 (Background)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p style="text-align: justify;">To understand decorator pattern let us consider a scenario inspired from the book “Head First Design Pattern”.  Suppose we are building an application for a pizza store and we need to model their pizza classes. Assume they offer four types of pizzas namely Peppy Paneer, Farmhouse, Margherita  and Chicken Fiesta. Initially we just use inheritance and abstract out the common functionality in a <strong>Pizza </strong>class.</p>
+<p><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza1.jpg"><img alt="pizza1" class="aligncenter wp-image-137582" height="527" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza1.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza1.jpg 1587w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza1-300x158.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza1-1024x539.jpg 1024w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza1-660x348.jpg 660w" width="1000"/></a></p>
+<p>Each pizza has different cost. We have overridden the getCost() in the subclasses to find the appropriate cost. Now suppose a new requirement, in addition to a pizza, customer can also ask for several toppings such as Fresh Tomato, Paneer, Jalapeno, Capsicum, Barbeque, etc. Let us think about for sometime that how do we accommodate changes in the above classes so that customer can choose pizza with toppings and we get the total cost of pizza and toppings the customer chooses.</p>
+<p>Let us look at various options.</p>
+<p><strong>Option 1</strong><br/>
+Create a new subclass for every topping with a pizza. The class diagram would look like:<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza2.jpg"><img alt="pizza2" class="aligncenter size-full wp-image-137584" height="549" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza2.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza2.jpg 1000w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza2-300x165.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza2-660x362.jpg 660w" width="1000"/></a></p>
+<p style="text-align: justify;">This looks very complex. There are way too many classes and is a maintenance nightmare. Also if we want to add a new topping or pizza we have to add so many classes. This is obviously very bad design.</p>
+<p> </p>
+<p><strong>Option 2:</strong><br/>
+Let’s add instance variables to pizza base class to represent whether or not each pizza has a topping. The class diagram would look like:<img alt="pizza3" class="aligncenter wp-image-137583" height="571" sizes="(max-width: 1000px) 100vw, 1000px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza3.jpg" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza3.jpg 1543w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza3-300x171.jpg 300w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza3-1024x585.jpg 1024w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/pizza3-660x377.jpg 660w" width="1000"/></p>
+<p>The getCost() of superclass calculates the costs for all the toppings while the one in the subclass adds the cost of that specific pizza.</p>
+<p> </p>
+<pre class="prettyprint">
+// Sample getCost() in super class
+public int getCost()
+{
+    int totalToppingsCost = 0;
+    if (hasJalapeno() )
+        totalToppingsCost += jalapenoCost;
+    if (hasCapsicum() )
+        totalToppingsCost += capsicumCost;
+
+    // similarly for other toppings
+    return totalToppingsCost;
+}
+</pre>
+<pre class="prettyprint">
+// Sample getCost() in subclass
+public int getCost()
+{
+    // 100 for Margherita and super.getCost()
+    // for toppings.
+    return super.getCost() + 100;
+}</pre>
+<p style="text-align: justify;">This design looks good at first but lets take a look at the problems associated with it.</p>
+<ul>
+<li style="text-align: justify;">Price changes in toppings will lead to alteration in the existing code.</li>
+<li style="text-align: justify;">New toppings will force us to add new methods and alter getCost() method in superclass.</li>
+<li style="text-align: justify;">For some pizzas, some toppings may not be appropriate yet the subclass inherits them.</li>
+<li style="text-align: justify;">What if customer wants double capsicum or double cheeseburst?</li>
+</ul>
+<p>In short our design violates one of the most popular design principle – <a href="https://en.wikipedia.org/wiki/Open/closed_principle" target="_blank"><strong>The Open-Closed Principle</strong></a> which states that classes should be open for extension and closed for modification.</p>
+<p>In the next set, we will be introducing Decorator Pattern and apply it to above above problem.</p>
+<p style="text-align: justify;"><strong>References: </strong>Head First Design Patterns( Book).</p>
+<p style="text-align: justify;">This article is contributed by <strong>Sulabh Kumar</strong>. If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p style="text-align: justify;">Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137538 post type-post status-publish format-standard hentry category-design category-java tag-design" id="post-137538">
+<header class="entry-header">
+<h1 class="entry-title">Singleton Design Pattern</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>The singleton pattern is one of the simplest design patterns. Sometimes we need to have only one instance of our class for example a single DB connection shared by multiple objects as creating a separate DB connection for every object may be costly. Similarly, there can be a single configuration manager or error manager in an application that handles all problems instead of creating multiple managers.</p>
+<p><strong>Definition:</strong><br/>
+<em>The singleton pattern is a design pattern that restricts the instantiation of a class to one object.</em><br/>
+Let’s see various design options for implementing such a class. If you have a good handle on static class variables and access modifiers this should not be a difficult task.</p>
+<p> </p>
+<p><strong><br/>
+Method 1: Classic Implementation</strong></p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Classical Java implementation of singleton 
+// design pattern
+class Singleton
+{
+    private static Singleton obj;
+
+    // private constructor to force use of
+    // getInstance() to create Singleton object
+    private Singleton() {}
+
+    public static Singleton getInstance()
+    {
+        if (obj==null)
+            obj = new Singleton();
+        return obj;
+    }
+}
+</pre>
+<p>Here we have declared getInstance() static so that we can call it without instantiating the class. The first time getInstance() is called it creates a new singleton object and after that it just returns the same object. Note that Singleton obj is not created until we need it and call getInstance() method. This is called lazy instantiation.</p>
+<p>The main problem with above method is that it is not thread safe. Consider the following execution sequence.</p>
+<p><a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/singleton.png"><img alt="singleton" class="aligncenter size-full wp-image-137540" height="180" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/singleton.png" width="400"/></a></p>
+<p>This execution sequence creates two objects for singleton. Therefore this classic implementation is not thread safe.</p>
+<p> </p>
+<p><strong><br/>
+Method 2: make getInstance() synchronized</strong></p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Thread Synchronized Java implementation of 
+// singleton design pattern
+class Singleton
+{
+    private static Singleton obj;
+
+    private Singleton() {}
+
+    // Only one thread can execute this at a time
+    public static synchronized Singleton getInstance()
+    {
+        if (obj==null)
+            obj = new Singleton();
+        return obj;
+    }
+}
+</pre>
+<p>Here using synchronized makes sure that only one thread at a time can execute getInstance().<br/>
+The main disadvantage of this is method is that using synchronized every time while creating the singleton object is expensive and may decrease the performance of your program. However if performance of getInstance() is not critical for your application this method provides a clean and simple solution.</p>
+<p> </p>
+<p><strong><br/>
+Method 3: Eager Instantiation</strong></p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Static initializer based Java implementation of
+// singleton design pattern
+class Singleton
+{
+    private static Singleton obj = new Singleton();
+
+    private Singleton() {}
+
+    public static Singleton getInstance()
+    {
+        return obj;
+    }
+}
+</pre>
+<p>Here we have created instance of singleton in static initializer. JVM executes static initializer when the class is loaded and hence this is guaranteed to be thread safe. Use this method only when your singleton class is light and is used throughout the execution of your program.</p>
+<p> </p>
+<p><strong><br/>
+Method 4 (Best): Use “<a href="https://en.wikipedia.org/wiki/Double-checked_locking">Double Checked Locking</a>” </strong><br/>
+If you notice carefully once an object is created synchronization is no longer useful because now obj will not be null and any sequence of operations will lead to consistent results.<br/>
+So we will only acquire lock on the getInstance() once, when the obj is null. This way we only synchronize the first way through, just what we want.</p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Double Checked Locking based Java implementation of
+// singleton design pattern
+class Singleton
+{
+    private volatile static Singleton obj;
+
+    private Singleton() {}
+
+    public static Singleton getInstance()
+    {
+        if (obj == null)
+        {
+            // To make thread safe
+            synchronized (Singleton.class)
+            {
+                // check again as multiple threads
+                // can reach above step
+                if (obj==null)
+                    obj = new Singleton();
+            }
+        }
+        return obj;
+    }
+}
+</pre>
+<p>We have declared the obj <a href="http://www.geeksforgeeks.org/volatile-keyword-in-java/">volatile</a> which ensures that multiple threads offer the obj variable correctly when it is being initialized to Singleton instance. This method drastically reduces the overhead of calling the synchronized method every time.</p>
+<p> <br/>
+<strong><br/>
+References:</strong><br/>
+Head First Design Patterns book (Highly recommended)<br/>
+<a href="https://en.wikipedia.org/wiki/Singleton_pattern">https://en.wikipedia.org/wiki/Singleton_pattern</a></p>
+<p>Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/java/" rel="category tag">Java</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137434 post type-post status-publish format-standard hentry category-design tag-design" id="post-137434">
+<header class="entry-header">
+<h1 class="entry-title">Observer Pattern | Set 2 (Implementation)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>We strongly recommend to refer below Set 1 before moving on to this post.</p>
+<p><strong><a href="http://www.geeksforgeeks.org/observer-pattern-set-1-introduction/">Observer Pattern -Introduction</a></strong></p>
+<p>In Set 1, we discussed below problem, a solution for the problem without Observer pattern and problems with the solution.</p>
+<p><em>Suppose we are building a cricket app that notifies viewers about the information such as current score, run rate etc. Suppose we have made two display elements CurrentScoreDisplay and AverageScoreDisplay. CricketData has all the data (runs, bowls etc.) and whenever data changes the display elements are notified with new data and they display the latest data accordingly<br/>
+</em></p>
+<p><strong>Applying Observer pattern to above problem:</strong><br/>
+Let us see how we can improve the design of our application using observer pattern. If we observe the flow of data we can easily see that the CricketData and display elements follow subject-observers relationship.</p>
+<p><strong>New Class Diagram:</strong><br/>
+<strong><em> <a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o3.png"><img alt="o3" class="aligncenter size-full wp-image-137435" height="345" sizes="(max-width: 546px) 100vw, 546px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o3.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o3.png 546w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o3-300x190.png 300w" width="546"/></a></em></strong></p>
+<p><strong><em>Java Implementation:</em></strong></p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Java program to demonstrate working of
+// onserver pattern
+import java.util.ArrayList;
+import java.util.Iterator;
+
+// Implemented by Cricket data to communicate
+// with observers
+interface Subject
+{
+    public void registerObserver(Observer o);
+    public void unregisterObserver(Observer o);
+    public void notifyObservers();
+}
+
+class CricketData implements Subject
+{
+    int runs;
+    int wickets;
+    float overs;
+    ArrayList&lt;Observer&gt; observerList;
+
+    public CricketData() {
+        observerList = new ArrayList&lt;Observer&gt;();
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        observerList.add(o);
+    }
+
+    @Override
+    public void unregisterObserver(Observer o) {
+        observerList.remove(observerList.indexOf(o));
+    }
+
+    @Override
+    public void notifyObservers()
+    {
+        for (Iterator&lt;Observer&gt; it =
+              observerList.iterator(); it.hasNext();)
+        {
+            Observer o = it.next();
+            o.update(runs,wickets,overs);
+        }
+    }
+
+    // get latest runs from stadium
+    private int getLatestRuns()
+    {
+        // return 90 for simplicity
+        return 90;
+    }
+
+    // get latest wickets from stadium
+    private int getLatestWickets()
+    {
+        // return 2 for simplicity
+        return 2;
+    }
+
+    // get latest overs from stadium
+    private float getLatestOvers()
+    {
+        // return 90 for simplicity
+        return (float)10.2;
+    }
+
+    // This method is used update displays
+    // when data changes
+    public void dataChanged()
+    {
+        //get latest data
+        runs = getLatestRuns();
+        wickets = getLatestWickets();
+        overs = getLatestOvers();
+
+        notifyObservers();
+    }
+}
+
+// This interface is implemented by all those
+// classes that are to be updated whenever there
+// is an update from CricketData
+interface Observer
+{
+    public void update(int runs, int wickets,
+                      float overs);
+}
+
+class AverageScoreDisplay implements Observer
+{
+    private float runRate;
+    private int predictedScore;
+
+    public void update(int runs, int wickets,
+                       float overs)
+    {
+        this.runRate =(float)runs/overs;
+        this.predictedScore = (int)(this.runRate * 50);
+        display();
+    }
+
+    public void display()
+    {
+        System.out.println("\nAverage Score Display: \n"
+                           + "Run Rate: " + runRate +
+                           "\nPredictedScore: " +
+                           predictedScore);
+    }
+}
+
+class CurrentScoreDisplay implements Observer
+{
+    private int runs, wickets;
+    private float overs;
+
+    public void update(int runs, int wickets,
+                       float overs)
+    {
+        this.runs = runs;
+        this.wickets = wickets;
+        this.overs = overs;
+        display();
+    }
+
+    public void display()
+    {
+        System.out.println("\nCurrent Score Display:\n"
+                           + "Runs: " + runs +
+                           "\nWickets:" + wickets +
+                           "\nOvers: " + overs );
+    }
+}
+
+// Driver Class
+class Main
+{
+    public static void main(String args[])
+    {
+        // create objects for testing
+        AverageScoreDisplay averageScoreDisplay =
+                          new AverageScoreDisplay();
+        CurrentScoreDisplay currentScoreDisplay =
+                          new CurrentScoreDisplay();
+
+        // pass the displays to Cricket data
+        CricketData cricketData = new CricketData();
+
+        // register display elements
+        cricketData.registerObserver(averageScoreDisplay);
+        cricketData.registerObserver(currentScoreDisplay);
+
+        // in real app you would have some logic to
+        // call this function when data changes
+        cricketData.dataChanged();
+
+        //remove an observer
+        cricketData.unregisterObserver(averageScoreDisplay);
+
+        // now only currentScoreDisplay gets the
+        // notification
+        cricketData.dataChanged();
+    }
+}
+</pre>
+<p><strong>Output:</strong></p>
+<pre class="gb wf prettyprint">Average Score Display: 
+Run Rate: 8.823529
+PredictedScore: 441
+
+Current Score Display:
+Runs: 90
+Wickets:2
+Overs: 10.2
+
+Current Score Display:
+Runs: 90
+Wickets:2
+Overs: 10.2
+
+</pre>
+<p><strong>Note: </strong>Now we can add/delete as many observers without changing the subject.</p>
+<p><strong>References:</strong>
+</p><ol>
+<li><a href="https://en.wikipedia.org/wiki/Observer_pattern">https://en.wikipedia.org/wiki/Observer_pattern</a></li>
+<li>Head First Design Patterns book (highly recommended)</li>
+</ol>
+<p>This article is contributed by<strong> Sulabh Kumar</strong>. If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p style="text-align: justify;">Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-137423 post type-post status-publish format-standard hentry category-design tag-design" id="post-137423">
+<header class="entry-header">
+<h1 class="entry-title">Observer Pattern | Set 1 (Introduction)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>Let us first consider the following scenario to understand  observer pattern.</p>
+<p><strong> </strong><strong>Scenario</strong>:
+</p><p style="text-align: justify;">Suppose we are building a cricket app that notifies viewers about the information such as current score, run rate etc. Suppose we have made two display elements CurrentScoreDisplay and AverageScoreDisplay. CricketData has all the data (runs, bowls etc.) and whenever data changes the display elements are notified with new data and they display the latest data accordingly.<a href="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o1.png"><img alt="o1" class="aligncenter wp-image-137424 size-full" height="393" sizes="(max-width: 628px) 100vw, 628px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o1.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o1.png 628w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o1-300x188.png 300w" width="628"/></a></p>
+<p style="text-align: justify;">Below is the java implementation of this design.</p>
+<pre class="brush: java; title: ; notranslate prettyprint" title="">
+// Java implementation of above design for Cricket App. The
+// problems with this design are discussed below.
+
+// A class that gets information from stadium and notifies
+// display elements, CurrentScoreDisplay &amp; AverageScoreDisplay
+class CricketData
+{
+    int runs, wickets;
+    float overs;
+    CurrentScoreDisplay currentScoreDisplay;
+    AverageScoreDisplay averageScoreDisplay;
+
+    // Constructor
+    public CricketData(CurrentScoreDisplay currentScoreDisplay,
+                       AverageScoreDisplay averageScoreDisplay)
+    {
+        this.currentScoreDisplay = currentScoreDisplay;
+        this.averageScoreDisplay = averageScoreDisplay;
+    }
+
+    // Get latest runs from stadium
+    private int getLatestRuns()
+    {
+        // return 90 for simplicity
+        return 90;
+    }
+
+    // Get latest wickets from stadium
+    private int getLatestWickets()
+    {
+        // return 2 for simplicity
+        return 2;
+    }
+
+    // Get latest overs from stadium
+    private float getLatestOvers()
+    {
+        // return 10.2 for simplicity
+        return (float)10.2;
+    }
+
+    // This method is used update displays when data changes
+    public void dataChanged()
+    {
+        // get latest data
+        runs = getLatestRuns();
+        wickets = getLatestWickets();
+        overs = getLatestOvers();
+
+        currentScoreDisplay.update(runs,wickets,overs);
+        averageScoreDisplay.update(runs,wickets,overs);
+    }
+}
+
+// A class to display average score. Data of this class is
+// updated by CricketData
+class AverageScoreDisplay
+{
+    private float runRate;
+    private int predictedScore;
+
+    public void update(int runs, int wickets, float overs)
+    {
+        this.runRate = (float)runs/overs;
+        this.predictedScore = (int) (this.runRate * 50);
+        display();
+    }
+
+    public void display()
+    {
+        System.out.println("\nAverage Score Display:\n" +
+                           "Run Rate: " + runRate +
+                           "\nPredictedScore: " + predictedScore);
+    }
+}
+
+// A class to display score. Data of this class is
+// updated by CricketData
+class CurrentScoreDisplay
+{
+    private int runs, wickets;
+    private float overs;
+
+    public void update(int runs,int wickets,float overs)
+    {
+        this.runs = runs;
+        this.wickets = wickets;
+        this.overs = overs;
+        display();
+    }
+
+    public void display()
+    {
+        System.out.println("\nCurrent Score Display: \n" +
+                           "Runs: " + runs +"\nWickets:"
+                           + wickets + "\nOvers: " + overs );
+    }
+}
+
+// Driver class
+class Main
+{
+    public static void main(String args[])
+    {
+        // Create objects for testing
+        AverageScoreDisplay averageScoreDisplay =
+                                       new AverageScoreDisplay();
+        CurrentScoreDisplay currentScoreDisplay =
+                                       new CurrentScoreDisplay();
+
+        // Pass the displays to Cricket data
+        CricketData cricketData = new CricketData(currentScoreDisplay,
+                                                  averageScoreDisplay);
+
+        // In real app you would have some logic to call this
+        // function when data changes
+        cricketData.dataChanged();
+    }
+}
+</pre>
+<p><strong> Output:</strong></p>
+<pre class="prettyprint" id="output-text">Current Score Display: 
+Runs: 90
+Wickets:2
+Overs: 10.2
+
+Average Score Display:
+Run Rate: 8.823529
+PredictedScore: 441</pre>
+<p><strong>Problems with above design</strong><strong>:</strong>
+</p><ul>
+<li style="text-align: justify;">CricketData holds references to concrete display element objects even though it needs to call only the update method of these objects. It has access to too much additional information it than it requires.</li>
+<li style="text-align: justify;">This statement “currentScoreDisplay.update(runs,wickets,overs);” violates one of the most important design principle “Program to interfaces, not implementations.” as we are using concrete objects to share data rather than abstract interfaces.</li>
+<li style="text-align: justify;">CricketData and display elements are tightly coupled.</li>
+<li style="text-align: justify;">If in future another requirement comes in and we need another display element to be added we need to make changes to the non-varying part of our code(CricketData). This is definitely not a good design practice and application might not be able to handle changes and not easy to maintain.</li>
+</ul>
+<p><strong>How to avoid these problems?</strong><br/>
+Use Observer Pattern</p>
+<p><strong>Observer pattern</strong></p>
+<p style="text-align: justify;">To understand observer pattern, first you need to understand the subject and observer objects.</p>
+<p style="text-align: justify;">The relation between subject and observer can easily be understood as an analogy to magazine subscription.</p>
+<ul style="text-align: justify;">
+<li>A magazine publisher(subject) is in the business and publishes magazines (data).</li>
+<li>If you(user of data/observer) are interested in the magazine you subscribe(register), and if a new edition is published it gets delivered to you.</li>
+<li>If you unsubscribe(unregister) you stop getting new editions.</li>
+<li>Publisher doesn’t know who you are and how you use the magazine, it just delivers it to you because you are a subscriber(loose coupling).</li>
+</ul>
+<p style="text-align: justify;"><strong>Definition:</strong></p>
+<p>The Observer Pattern defines a one to many dependency between objects so that one object changes state, all of its dependents are notified and updated automatically.</p>
+<p><strong>Explanation:</strong>
+</p><ul>
+<li>One to many dependency is between Subject(One) and Observer(Many).</li>
+<li>There is dependency as Observers themselves don’t have access to data. They are dependent on Subject to provide them data.</li>
+</ul>
+<p><strong>Class diagram:<img alt="o2" class="aligncenter wp-image-137425 size-full" height="211" sizes="(max-width: 504px) 100vw, 504px" src="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o2.png" srcset="http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o2.png 504w, http://d1hyf4ir1gqw6c.cloudfront.net//wp-content/uploads/o2-300x126.png 300w" width="504"/></strong></p>
+<p>Image Source : <a href="https://en.wikipedia.org/wiki/Observer_pattern">Wikipedia</a></p>
+<ul>
+<li>Here Observer and Subject are interfaces(can be any abstract super type not necessarily java interface).</li>
+<li>All observers who need the data need to implement observer interface.</li>
+<li>notify() method in observer interface defines the action to be taken when the subject provides it data.</li>
+<li>The subject maintains an observerCollection which is simply the list of currently registered(subscribed) observers.</li>
+<li>registerObserver(observer) and unregisterObserver(observer) are methods to add and remove observers respectively.</li>
+<li>notifyObservers() is called when the data is changed and the observers need to be supplied with new data.</li>
+</ul>
+<p><strong>Advantages:</strong><br/>
+Provides a loosely coupled design between objects that interact. Loosely coupled objects are flexible with changing requirements. Here loose coupling means that the interacting objects should have less information about each other.</p>
+<p>Observer pattern provides this loose coupling as:</p>
+<ul>
+<li>Subject only knows that observer implement Observer interface.Nothing more.</li>
+<li>There is no need to modify Subject to add or remove observers.</li>
+<li>We can reuse subject and observer classes independently of each other.</li>
+</ul>
+<p><strong>Disadvantages:</strong>
+</p><ul>
+<li>Memory leaks caused by <a href="https://en.wikipedia.org/wiki/Lapsed_listener_problem">Lapsed listener problem</a> because of explicit register and unregistering of observers.</li>
+</ul>
+<p><strong>When to use this pattern?</strong><br/>
+You should consider using this pattern in your application when multiple objects are dependent on the state of one object as it provides a neat and well tested design for the same.</p>
+<p><strong>Real Life Uses:</strong>
+</p><ul>
+<li>It is heavily used in GUI toolkits and event listener. In java the button(subject) and onClickListener(observer) are modelled with observer pattern.</li>
+<li>Social media, RSS feeds, email subscription in which you have the option to follow or subscribe and you receive latest notification.</li>
+<li>All users of an app on play store gets notified if there is an update.</li>
+</ul>
+<p><a href="http://www.geeksforgeeks.org/observer-pattern-set-2-implementation/">Observer Pattern | Set 2 (Implementation)</a></p>
+<p style="text-align: justify;">This article is contributed by <strong>Sulabh Kumar</strong>. If you like GeeksforGeeks and would like to contribute, you can also write an article and mail your article to contribute@geeksforgeeks.org. See your article appearing on the GeeksforGeeks main page and help other Geeks.</p>
+<p style="text-align: justify;">Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-135239 post type-post status-publish format-standard hentry category-design tag-design" id="post-135239">
+<header class="entry-header">
+<h1 class="entry-title">Design Patterns | Set 2 (Factory Method)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>Factory method is a <a href="http://www.geeksforgeeks.org/design-patterns-set-1-introduction/">creational design pattern</a>, i.e., related to object creation.  <span id="more-135239"></span>In Factory pattern, we create object without exposing the creation logic to client and the client use the same common interface to create new type of object.<br/>
+The idea is to use a static member-function (static factory method) which creates &amp; returns instances, hiding the details of class modules from user.</p>
+<p>A factory pattern is one of the core design principles to create an object, allowing clients to create objects of a library(explained below) in a way such that it doesn’t have tight coupling with the class hierarchy of the library.</p>
+<p><em><strong>What is meant when we talk about library and clients?</strong></em><br/>
+A library is something which is provided by some third party which exposes some public APIs and clients make calls to those public APIs to complete its task. A very simple example can be different kinds of Views provided by Android OS.</p>
+<p><em><strong>Why factory pattern?</strong></em><br/>
+Let us understand it with an example:</p>
+<pre class="brush: cpp; highlight: [26,27,28,29,30,31,32,33,34,35]; title: ; notranslate prettyprint" title="">
+// A design without factory pattern
+#include &lt;iostream&gt;
+using namespace std;
+
+// Library classes
+class Vehicle {
+public:
+    virtual void printVehicle() = 0;
+};
+class TwoWheeler : public Vehicle {
+public:
+    void printVehicle()  {
+        cout &lt;&lt; "I am two wheeler" &lt;&lt; endl;
+    }
+};
+class FourWheeler : public Vehicle {
+    public:
+    void printVehicle()  {
+        cout &lt;&lt; "I am four wheeler" &lt;&lt; endl;
+    }
+};
+
+// Client (or user) class
+class Client {
+public:
+    Client(int type)  {
+
+        // Client explicitly creates classes according to type
+        if (type == 1)
+            pVehicle = new TwoWheeler();
+        else if (type == 2)
+            pVehicle = new FourWheeler();
+        else
+            pVehicle = NULL;
+    }
+
+    ~Client()   {
+        if (pVehicle)
+        {
+            delete[] pVehicle;
+            pVehicle = NULL;
+        }
+    }
+
+    Vehicle* getVehicle() {
+        return pVehicle;
+    }
+private:
+    Vehicle *pVehicle;
+};
+
+// Driver program
+int main() {
+    Client *pClient = new Client(1);
+    Vehicle * pVehicle = pClient-&gt;getVehicle();
+    pVehicle-&gt;printVehicle();
+    return 0;
+}
+</pre>
+<p>Output:
+</p><pre class="prettyprint">I am two wheeler</pre>
+<p><em><strong>What is the problems with above design?</strong></em><br/>
+As you must have observed in the above example, Client creates objects of either TwoWheeler or FourWheeler based on some input during constructing its object.<br/>
+Say, library introduces a new class ThreeWheeler to incorporate three wheeler vehicles also. What would happen? Client will end up chaining a new else if in the conditional ladder to create objects of ThreeWheeler. Which in turn will need Client to be recompiled. So, each time a new change is made at the library side, Client would need to make some corresponding changes at its end and recompile the code. Sounds bad? This is a very bad practice of design. </p>
+<p><strong>How to avoid the problem?</strong><br/>
+The answer is, create a static (or factory) method. Let us see below code.</p>
+<pre class="brush: cpp; highlight: [50,51,52,53,54,55,56]; title: ; notranslate prettyprint" title="">
+// C++ program to demonstrate factory method design pattern
+#include &lt;iostream&gt;
+using namespace std;
+
+enum VehicleType {
+    VT_TwoWheeler,    VT_ThreeWheeler,    VT_FourWheeler
+};
+
+// Library classes
+class Vehicle {
+public:
+    virtual void printVehicle() = 0;
+    static Vehicle* Create(VehicleType type);
+};
+class TwoWheeler : public Vehicle {
+public:
+    void printVehicle() {
+        cout &lt;&lt; "I am two wheeler" &lt;&lt; endl;
+    }
+};
+class ThreeWheeler : public Vehicle {
+public:
+    void printVehicle() {
+        cout &lt;&lt; "I am three wheeler" &lt;&lt; endl;
+    }
+};
+class FourWheeler : public Vehicle {
+    public:
+    void printVehicle() {
+        cout &lt;&lt; "I am four wheeler" &lt;&lt; endl;
+    }
+};
+
+// Factory method to create objects of different types.
+// Change is required only in this function to create a new object type
+Vehicle* Vehicle::Create(VehicleType type) {
+    if (type == VT_TwoWheeler)
+        return new TwoWheeler();
+    else if (type == VT_ThreeWheeler)
+        return new ThreeWheeler();
+    else if (type == VT_FourWheeler)
+        return new FourWheeler();
+    else return NULL;
+}
+
+// Client class
+class Client {
+public:
+
+    // Client doesn't explicitly create objects
+    // but passes type to factory method "Create()"
+    Client()
+    {
+        VehicleType type = VT_ThreeWheeler;
+        pVehicle = Vehicle::Create(type);
+    }
+    ~Client() {
+        if (pVehicle) {
+            delete[] pVehicle;
+            pVehicle = NULL;
+        }
+    }
+    Vehicle* getVehicle()  {
+        return pVehicle;
+    }
+
+private:
+    Vehicle *pVehicle;
+};
+
+// Driver program
+int main() {
+    Client *pClient = new Client();
+    Vehicle * pVehicle = pClient-&gt;getVehicle();
+    pVehicle-&gt;printVehicle();
+    return 0;
+}
+</pre>
+<p>Output:
+</p><pre class="prettyprint">I am three wheeler</pre>
+<p>In the above example, we have totally decoupled the selection of type for object creation from Client. The library is now responsible to decide which object type to create based on an input. Client just needs to make call to library’s factory Create method and pass the type it wants without worrying about the actual implementation of creation of objects.</p>
+<p>Thanks to <a href="http://qa.geeksforgeeks.org/user/Rumplestiltskin">Rumplestiltskin</a> for providing above explanation <a href="http://qa.geeksforgeeks.org/559/what-is-factory-pattern-how-to-implement-it-in-c?show=559#q559">here</a>.</p>
+<p><strong><br/>
+Other examples of Factory Method: </strong>
+</p><ol>
+<li>Say, in a ‘Drawing’ system, depending on user’s input, different pictures like square, rectangle, circle can be drawn. Here we can use factory method to create instances depending on user’s input. For adding new type of shape, no need to change client’s code.</li>
+<li>Another example: In travel site, we can book train ticket as well bus tickets and flight ticket. In this case user can give his travel type as ‘bus’, ‘train’ or ‘flight’.<br/>
+Here we have an abstract class ‘AnyTravel’ with a static member function ‘GetObject’ which depending on user’s travel type, will create &amp; return object of ‘BusTravel’ or ‘ TrainTravel’. ‘BusTravel’ or ‘ TrainTravel’ have common functions like passenger name, Origin, destinationparameters.</li>
+<li> Also see <a href="http://qa.geeksforgeeks.org/423/factory-design-pattern?show=423#q423">this </a>interview question.</li>
+</ol>
+<p>Thanks to Abhijit Saha providing the first 2 examples.</p>
+<p>Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above.</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article><hr><article class="post-135173 post type-post status-publish format-standard hentry category-design tag-design" id="post-135173">
+<header class="entry-header">
+<h1 class="entry-title">Design Patterns | Set 1 (Introduction)</h1>
+</header><!-- .entry-header -->
+<div class="entry-content">
+<p>Design pattern is a general reusable solution or template to a commonly occurring problem in software design. The patterns typically show relationships and interactions between classes or objects. <span id="more-135173"></span>The idea is to speed up the development process by providing tested, proven development paradigm.  </p>
+<p> <br/>
+<strong>Goal: </strong><br/>
+•	Understand the problem and matching it with some pattern.<br/>
+•	Reusage of old interface or making the present design reusable for the future usage.</p>
+<p> <br/>
+<strong>Example:</strong><br/>
+For example, in many real world situations we want to create only one instance of a class. For example, there can be only one active president of country at a time regardless of personal identity. This pattern is called Singleton pattern.  Other software examples could be a single DB connection shared by multiple objects as creating a separate DB connection for every object may be costly.  Similarly, there can be a single configuration manager or error manager in an application that handles all problems instead of creating multiple managers.</p>
+<p> <br/>
+<strong>Types of Design Patterns</strong><br/>
+There are mainly three types of design patterns: </p>
+<p> <br/>
+<strong>1. Creational</strong><br/>
+These design patterns are all about class instantiation or object creation. These patterns can be further categorized into Class-creational patterns and object-creational patterns. While class-creation patterns use inheritance effectively in the instantiation process, object-creation patterns use delegation effectively to get the job done. </p>
+<p>Creational design patterns are Factory Method, Abstract Factory, Builder, Singleton, Object Pool, Prototype and Singleton.</p>
+<p> <br/>
+<strong>2. Structural</strong><br/>
+These design patterns are about organizing different classes and objects to form larger structures and provide new functionality. </p>
+<p>Structural design patterns are Adapter, Bridge, Composite, Decorator, Facade, Flyweight, Private Class Data and Proxy.</p>
+<p> <br/>
+<strong>3. Behavioral</strong><br/>
+Behavioral patterns are about identifying common communication patterns between objects and realize these patterns. </p>
+<p>Behavioral patterns are Chain of responsibility, Command, Interpreter, Iterator, Mediator, Memento, Null Object, Observer,  State, Strategy, Template method, Visitor</p>
+<p> <br/>
+<strong>References:</strong><br/>
+<a href="https://sourcemaking.com/design_patterns">https://sourcemaking.com/design_patterns</a><br/>
+<a href="https://sourcemaking.com/design_patterns/singleton">https://sourcemaking.com/design_patterns/singleton</a></p>
+<p>This article is contributed by <strong>Abhijit Saha</strong>. Please write comments if you find anything incorrect, or you want to share more information about the topic discussed above.</p>
+<div class="AdsParent" style="width:100%;display:inline-flex">
+<span class="rectangleAd" style="width: 52%;">
+
+<!-- Big Rectangle Blog Bottom -->
+
+
+</span>
+<span class="responsiveAd" style="width: 48%;">
+
+<!-- newMobile2 -->
+
+
+</span>
+</div>
+<h1><strong><a href="http://quiz.geeksforgeeks.org/gate-corner-2/">GATE CS Corner</a>
+   <a href="http://www.practice.geeksforgeeks.org/tags.php">Company Wise Coding Practice</a></strong></h1>
+</div><!-- .entry-content -->
+<footer class="entry-meta">
+<span><div class="categoryButton"><a href="http://www.geeksforgeeks.org/category/design/" rel="category tag">Design</a></div></span> <span><div class="tagButton"><a href="http://www.geeksforgeeks.org/tag/design/" rel="tag">design</a></div></span>
+</footer><!-- .entry-meta -->
+</article>
+                    </body></html>
+                   
